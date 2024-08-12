@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Link ,useNavigate} from 'react-router-dom'
 import { z } from "zod"
-import { useCreateUserAccount } from "@/lib/react-query/queriesAndMutations"
+import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations"
 import { signInAccount } from "@/lib/appwrite/api"
 import { useUserContext } from "@/context/AuthContext"
 
@@ -24,9 +24,14 @@ import { useUserContext } from "@/context/AuthContext"
 const SignUpForm = () => {
   const { toast } = useToast()
   const{ checkAuthUser, isLoading: isUserLoading}= useUserContext()
-  const { mutateAsync: createUserAccount, isLoading: isCreatingUser} = useCreateUserAccount();
   const navigate = useNavigate();
+
+  const { mutateAsync: createUserAccount, isPending: isCreatingAccount} = useCreateUserAccount();
+  const { mutateAsync: signInAccount, isPending: isSigningIn} = useSignInAccount();
+
+  
   // 1. Define your form.
+
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
     defaultValues: {
@@ -125,7 +130,7 @@ const SignUpForm = () => {
         )}
       />
           <Button type="submit" className="shad-button_primary">
-            {isCreatingUser?( 
+            {isCreatingAccount?( 
               <div className="flex-center gap-2">
                <Loader/> Loading...
               </div>
